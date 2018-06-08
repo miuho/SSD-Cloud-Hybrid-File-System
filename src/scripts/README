@@ -1,0 +1,55 @@
+1. How to setup your disks (SSD) in the VirtualBox setup?
+=============================================================
+
+First "cd" into the 'scripts/' directory and then run the following scripts in 
+the order given below:
+
+./format_disks.sh           (to create the SSD disk with ext4 file system)
+./mount_disks.sh
+./umount_disks.sh
+
+If successful, you are ready to use the VirtualBox for your experiments.
+
+
+2. Description of all the scripts
+=================================
+
+This "scripts/" directory contains the following scripts:
+
+/*
+ ********************************
+ *** VirtualBox Setup Scripts ***
+ ********************************
+ */
+
+[format_disks.sh]
+    - To create the Ext4 file system on the SSD 
+    - Usage: ./format_disks.sh
+
+[mount_disks.sh]
+    - To mount the SSD to appropriate mount points (passed as
+      arguments to the script)
+    - Usage: ./mount_disks.sh
+
+[umount_disks.sh]
+    - To un-mount the SSD from appropriate mount points (passed as
+      arguments to the script)
+    - Usage: ./umount_disks.sh
+
+/*
+ *******************************
+ *** General Support Scripts ***
+ *******************************
+ */
+
+[cloudfs_controller.sh]
+    - This allows you to unmount, mount and remout the file system at the
+      desired mount point and with the desired threshold
+    - NOTE: this script uses fixed constants for three cloudFS parameters ...
+            --- the process path (../build/bin/cloudfs)
+            --- the SSD mount point (/home/student/mnt/ssd/)
+            --- the Fuse mount point (/home/student/mnt/fuse/)
+    - Usage: 
+        ./cloudfs_controller.sh MODE <arguments-to-cloudfs>"
+      where ...
+        MODE is either m for mount, u for unmount, x for (unmount+mount)

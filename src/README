@@ -1,0 +1,128 @@
+./src/
+├── cloudfs                        The directory containing skeleton code for CloudFS
+│   ├── cloudfs.c                  The skeleton code of CloudFS FUSE implementation
+│   ├── cloudfs.h
+│   └── main.c                     The main function for CloudFS that parses command line to extract options
+├── cloud-lib                      The cloud api library           
+│   ├── cloudapi.c                 The wrapper functions of libs3
+│   ├── cloudapi.h
+│   ├── cloud-example.c            An example of showing how to use functions in cloudapi.h
+├── dedup-lib                      The rabin segmentation library           
+│   ├── dedup.h	                   Interface header
+│   ├── Makefile                   
+│   ├── msb.c                      Helper functions
+│   ├── msb.h
+│   ├── rabin-example.c            An example of showing how to use functions in dedup.h
+│   ├── rabinpoly.c                Implementation of rabin fingerprinting algorithm
+│   ├── rabinpoly.h
+├── include
+│   └── libs3.h                    The header file of libs3
+│   └── dedup.h                    The interface header file of libdedup(src in ../dedup-lib; staged here)
+├── lib
+│   └── libs3.a                    The library file of libs3. To get different binary, you can download libs3 from its website, and compile it by yourself.
+│   └── libdedup.a                 The rabin segmentation library (compiled in ../dedup-lib and staged here)
+├── Makefile                       "make" generates the binary "src/build/bin/cloudfs", and "make example" generates "src/build/bin/example"
+├── README
+├── s3-client                      An example of how to use the original libs3 library
+│   ├── include
+│   │   └── libs3.h
+│   ├── lib
+│   │   └── libs3.a
+│   ├── Makefile
+│   ├── src
+│   │   └── s3.c
+│   └── test.sh
+├── s3-server
+│   ├── run_server                  An example script that runs S3 server in default port
+│   └── s3server.pyc                Compiled python code of web server. Run ``python ./s3server.py --help" to list all the options
+├── scripts                           
+│   ├── cloudfs_controller.sh       A script that mounts CloudFS 
+│   ├── format_disks.sh             A script that formats SSD and HDD into Ext2 file system
+│   ├── mount_disks.sh              A script that mounts SSD and HDD
+│   ├── reset.sh                    clean up to go back to default state
+│   ├── kill_server.sh              Find and kill s3-server
+│   ├── README
+│   ├── functions.sh                Common functions used for testing
+│   └── umount_disks.sh             A script that umounts SSD
+├── tests                           Tests folder that contains all the tests
+│   ├── checkpoint_1                Checkpoint wise split
+│   │   └── test_1_1                Internal test per checkpoint
+│   │   └── test_1_2
+│   │   └── ...
+│   ├── checkpoint_2                Common functions used for testing
+│   ├── checkpoint_3                Common functions used for testing
+└── snapshot
+    ├── snapshot-api.h              The header file for the snapshot spec (ioctls and constants)
+    ├── snapshot-test.c             The file that tests use to run snapshots.
+    └── Makefile                    To make the test binary.
+
+1. How to run cloud-example.c ?
+
+   (a) Build example:
+       Under src directory, run the command:
+       make cloud-example
+  
+   (b) Create a temporary file:
+       /tmp/README
+       
+   (c) Run S3 server under src/s3-server/:
+       ./run_server &
+    or:
+       python ./s3server.pyc &
+
+   (d) Run example:
+       ./build/bin/cloud-example
+       
+2. How to extract cloud cost from S3 server?
+   Assume your server binds to localhost:8888
+   You can use:
+   curl http://localhost:8888/admin/stat 
+   To get cloud usage statistics:
+    NumRequests: number of requests S3 server received from the boot 
+    NumReadBytes: number of bytes S3 server sent out from the boot 
+    CurrentUsage: total size of files S3 server store currently (assume the server is empty at the beginning)
+    MaxUsage: maximum usage of S3 server from the boot
+
+3. How to run tests ?
+   Tests can be executed by simply cd'ing into the src/ folder and executing make.
+   Example: make test_1_1
+   Tests are organized as test_<checkpoint>_<test_num>
+
+4. How to run rabin-example.c ?
+
+   (a) Build example:
+       Under src directory, run the command:
+       make rabin-example
+  
+   (b) Create a temporary files:
+	   dd if=/dev/urandom of=/tmp/bigfile bs=1024 count=20
+	   dd if=/dev/urandom of=/tmp/smallfile bs=1 count=1
+       
+   (c) Run example:
+       $cat /tmp/bigfile | ./build/bin/rabin-example
+       $cat /tmp/smallfile /tmp/bigfile | ./build/bin/rabin-example
+     
+	   You can also specify other parameters. See rabin-example -h
+
+5. How to run snapshots ?
+
+   (a) Build the test binary:
+       Under src/snapshot directory, run make
+ 
+   (b) To take a snapshot:
+	   ./scripts/snapshot <path to fuse>/.snapshot s (it prints out a timestamp)
+
+   (c) To restore:
+	   ./scripts/snapshot <path to fuse>/.snapshot r <timestamp>
+
+   (d) To delete:
+	   ./scripts/snapshot <path to fuse>/.snapshot d <timestamp>
+
+   (e) To install:
+	   ./scripts/snapshot <path to fuse>/.snapshot i <timestamp>
+
+   (f) To uninstall:
+	   ./scripts/snapshot <path to fuse>/.snapshot u <timestamp>
+
+   (g) To list:
+	   ./scripts/snapshot <path to fuse>/.snapshot l

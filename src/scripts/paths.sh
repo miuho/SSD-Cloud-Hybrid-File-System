@@ -1,0 +1,7 @@
+SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SSD_MNT="/home/student/mnt/ssd"
+FUSE_MNT="/home/student/mnt/fuse"
+SSD_DEV="/dev/sdb1"
+CLOUDFS_BIN="$SCRIPTS_DIR/../build/bin/cloudfs"
+CACHE_DIR="$SSD_MNT/.cache"
+S3_DIR="/tmp/s3"
